@@ -11,7 +11,8 @@ While many (much more advanced) alternatives exist already, one advantage of
 this script is that it only requires Bash and Podman (rootless).
 
 The script exit code is the sum of executed commands exit codes, which means 0
-if everything went fine. Use `echo $?` to display it after execution.
+if everything went fine.
+Use `echo $?` to display it after execution.
 
 ## Requirements
 
@@ -39,7 +40,7 @@ Commands:
   exec   Execute a command inside Podman containers
 ```
 
-### Exec
+### exec command
 
 ```
 $ podmatrix exec --help
@@ -76,7 +77,8 @@ Examples:
 ## Examples
 
 Current directory contains a Python application and a `test.sh` script which
-builds and tests it. To test it with different Python versions:
+builds and tests it.
+To test it with different Python versions:
 
 ```
 podmatrix exec ./test.sh --source . --target /tmp/src \

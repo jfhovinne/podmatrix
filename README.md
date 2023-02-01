@@ -111,7 +111,7 @@ Compare installation of the curl package in Debian and Ubuntu (why not):
 
 ```
 podmatrix exec "apt update && apt install -y curl" \
---image debian --image ubuntu --tag latest > curl.log
+--image debian --image ubuntu > curl.log
 ```
 
 Clone a Python app repository and install its dependencies:

@@ -1,0 +1,35 @@
+name: podmatrix
+help: A script which executes commands within a 'matrix' of Podman containers
+version: 0.1.0
+
+environment_variables:
+
+commands:
+- name: exec
+  alias: e
+  help: Execute a command inside Podman containers
+
+  args:
+  - name: command
+    required: true
+    help: The command to execute
+
+  flags:
+  - long: --source
+    short: -s
+    arg: source
+    help: Local source path to copy into containers
+  - long: --target
+    short: -t
+    arg: target
+    help: Container path to copy source to and where command will be executed
+  - long: --image
+    short: -i
+    arg: image
+    help: The container image to run
+    repeatable: true
+
+  examples:
+  - podmatrix exec ./test.sh --source . --target /tmp/src --image python:3.9 --image python:3.10 --image python:3.11
+
+  environment_variables:

@@ -12,6 +12,7 @@ this script is that it only requires Bash and Podman (rootless).
 
 The script exit code is the sum of executed commands exit codes, which means 0
 if everything went fine.
+
 Use `echo $?` to display it after execution.
 
 ## Requirements
@@ -78,6 +79,7 @@ Examples:
 
 Current directory contains a Python application and a `test.sh` script which
 builds and tests it.
+
 To test it with different Python versions:
 
 ```

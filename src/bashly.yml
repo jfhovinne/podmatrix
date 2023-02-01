@@ -1,6 +1,6 @@
 name: podmatrix
 help: A script which executes commands within a 'matrix' of Podman containers
-version: 0.1.0
+version: 0.2.0
 
 environment_variables:
 
@@ -28,8 +28,14 @@ commands:
     arg: image
     help: The container image to run
     repeatable: true
+  - long: --tag
+    arg: tag
+    help: The container image tag to run
+    repeatable: true
+    default: latest
 
   examples:
-  - podmatrix exec ./test.sh --source . --target /tmp/src --image python:3.9 --image python:3.10 --image python:3.11
+  - podmatrix exec ./test.sh --source . --target /tmp/src --image python --tag 3.9 --tag 3.10 --tag 3.11
+  - podmatrix exec ./test.sh --source . --target /tmp/src --image python --image docker.io/pypy --tag 3.8 --tag 3.9
 
   environment_variables:

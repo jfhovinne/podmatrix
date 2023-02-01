@@ -97,6 +97,12 @@ podmatrix_exec_usage() {
     printf "    The container image to run\n"
     echo
 
+    # :flag.usage
+    printf "  %s\n" "--tag TAG (repeatable)"
+    printf "    The container image tag to run\n"
+    printf "    Default: latest\n"
+    echo
+
     # :command.usage_args
     printf "%s\n" "Arguments:"
 
@@ -107,7 +113,8 @@ podmatrix_exec_usage() {
 
     # :command.usage_examples
     printf "%s\n" "Examples:"
-    printf "  podmatrix exec ./test.sh --source . --target /tmp/src --image python:3.9\n  --image python:3.10 --image python:3.11\n"
+    printf "  podmatrix exec ./test.sh --source . --target /tmp/src --image python --tag 3.9\n  --tag 3.10 --tag 3.11\n"
+    printf "  podmatrix exec ./test.sh --source . --target /tmp/src --image python --image\n  docker.io/pypy --tag 3.8 --tag 3.9\n"
     echo
 
   fi
@@ -165,28 +172,31 @@ podmatrix_exec_command() {
   source=${args[--source]}
   target=${args[--target]}
   eval "images=(${args[--image]})"
+  eval "tags=(${args[--tag]})"
   exitcode=0
 
   for image in "${images[@]}"; do
-    >&2 echo "Launching ${image}"
-    CT=$(podman run -itd ${image} /bin/sh)
-    set +e
-    if [[ -n ${source} ]] && [[ -n ${target} ]]; then
-      >&2 echo "Copying ${source} to ${target}"
-      podman cp $source $CT:$target
-      >&2 echo "Executing command"
-      podman exec $CT bash -c "cd $target && ${command}"
-      ((exitcode+=$?))
-    else
-      >&2 echo "Executing command"
-      podman exec $CT bash -c "${command}"
-      ((exitcode+=$?))
-    fi
-    set -e
-    >&2 echo "Stopping ${image}"
-    podman stop $CT > /dev/null
-    >&2 echo "Removing ${image}"
-    podman rm $CT > /dev/null
+    for tag in "${tags[@]}"; do
+      >&2 echo "Launching ${image}:${tag}"
+      CT=$(podman run -itd ${image}:${tag} /bin/sh)
+      set +e
+      if [[ -n ${source} ]] && [[ -n ${target} ]]; then
+        >&2 echo "Copying ${source} to ${target}"
+        podman cp $source $CT:$target
+        >&2 echo "Executing command"
+        podman exec $CT bash -c "cd $target && ${command}"
+        ((exitcode+=$?))
+      else
+        >&2 echo "Executing command"
+        podman exec $CT bash -c "${command}"
+        ((exitcode+=$?))
+      fi
+      set -e
+      >&2 echo "Stopping ${image}:${tag}"
+      podman stop $CT > /dev/null
+      >&2 echo "Removing ${image}:${tag}"
+      podman rm $CT > /dev/null
+    done
   done
 
   exit $exitcode
@@ -339,6 +349,25 @@ podmatrix_exec_parse_requirements() {
         fi
         ;;
 
+      # :flag.case
+      --tag)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+
+          if [[ -z ${args['--tag']+x} ]]; then
+            args['--tag']="\"$2\""
+          else
+            args['--tag']="${args[--tag]} \"$2\""
+          fi
+          shift
+          shift
+        else
+          printf "%s\n" "--tag requires an argument: --tag TAG" >&2
+          exit 1
+        fi
+        ;;
+
       -?*)
         printf "invalid option: %s\n" "$key" >&2
         exit 1
@@ -367,11 +396,14 @@ podmatrix_exec_parse_requirements() {
     exit 1
   fi
 
+  # :command.default_assignments
+  [[ -n ${args['--tag']:-} ]] || args['--tag']="latest"
+
 }
 
 # :command.initialize
 initialize() {
-  version="0.1.0"
+  version="0.2.0"
   long_usage=''
   set -e
 

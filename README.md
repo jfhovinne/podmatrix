@@ -3,12 +3,12 @@
 A script which executes commands within a 'matrix' of Podman containers.
 
 One purpose would be to quickly spawn containers and launch an application
-test suite within those containers.
+test suite within those containers, against multiple versions of a specific
+programming language.
 
-The containers are currently created then destroyed in sequence.
+The containers are created in sequence, then commands are executed in parallel.
 
-While many (much more advanced) alternatives exist already, one advantage of
-this script is that it only requires Bash and Podman (rootless).
+`podmatrix` is fast and only requires Bash and rootless Podman.
 
 The script exit code is the sum of executed commands exit codes, which means 0
 if everything went fine.

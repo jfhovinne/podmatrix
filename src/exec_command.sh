@@ -12,11 +12,11 @@ exec() {
     >&2 echo "Copying ${source} to ${target}"
     podman cp $source $CT:$target
     >&2 echo "Executing command"
-    podman exec $CT bash -c "cd $target && ${command}"
+    podman exec $CT sh -c "cd $target && ${command}"
     exitcode=$?
   else
     >&2 echo "Executing command"
-    podman exec $CT bash -c "${command}"
+    podman exec $CT sh -c "${command}"
     exitcode=$?
   fi
   set -e
